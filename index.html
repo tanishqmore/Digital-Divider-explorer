@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World Wired — Digital Divide Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0B1220; --surface:#121A2B; --line:#22304A;
+    --text:#E7ECF5; --muted:#8592AC; --accent:#E8A33D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', system-ui, sans-serif;}
+  h1{font-family:'Instrument Serif', Georgia, serif; font-weight:400;}
+  header{padding:2.5rem 1.5rem 1.5rem; max-width:960px; margin:0 auto;}
+  header h1{font-size:2.4rem; margin:0 0 .4rem;}
+  header p{color:var(--muted); max-width:560px; line-height:1.5; font-size:.95rem;}
+  main{max-width:960px; margin:0 auto; padding:0 1.5rem 3rem;}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1.25rem; margin-bottom:1.25rem;}
+  .controls{display:flex; flex-wrap:wrap; gap:1.5rem;}
+  .control-group{display:flex; flex-direction:column; gap:.5rem;}
+  .control-group label{font-size:.78rem; color:var(--muted);}
+  select{background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:.5rem .7rem; font-family:inherit;}
+  .chips{display:flex; flex-wrap:wrap; gap:.4rem; max-width:460px;}
+  .chip{border:1px solid var(--line); border-radius:999px; padding:.35rem .8rem; font-size:.82rem; cursor:pointer; background:transparent; color:var(--muted);}
+  .chip.active{border-color:var(--accent); color:var(--accent);}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border-radius:10px; overflow:hidden; margin-bottom:1.25rem;}
+  .stat{background:var(--surface); padding:1rem 1.2rem;}
+  .stat .num{font-family:'Instrument Serif',serif; font-size:1.8rem; color:var(--accent); display:block;}
+  .stat .label{font-size:.76rem; color:var(--muted);}
+  .chart-wrap{position:relative; height:380px;}
+  footer{max-width:960px; margin:0 auto; padding:0 1.5rem 2rem; color:var(--muted); font-size:.8rem; line-height:1.6;}
+  footer a{color:var(--accent);}
+  #err{background:#3a1c1c; border:1px solid #7a3b3b; color:#f3c6c6; padding:1rem; border-radius:8px; margin-bottom:1rem; display:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>World Wired</h1>
+  <p>Real internet-adoption and income data for six countries, 2000–2024, pulled from the World Bank / Our World in Data. Pick a metric, choose countries to compare.</p>
+</header>
+<main>
+  <div id="err"></div>
+  <div class="panel controls">
+    <div class="control-group">
+      <label for="metric">Metric</label>
+      <select id="metric">
+        <option value="internet_pct">Internet users (% of population)</option>
+        <option value="internet_users">Internet users (absolute count)</option>
+        <option value="gdp_growth_pct">GDP per capita growth (annual %)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Countries</label>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="panel"><div class="chart-wrap"><canvas id="chart"></canvas></div></div>
+</main>
+<footer>
+  Data: ITU/World Bank World Development Indicators, processed by
+  <a href="https://ourworldindata.org/internet" target="_blank" rel="noopener">Our World in Data</a>
+  (CC BY 4.0). See <code>data/dataset.json</code> for exact source links, and
+  <code>scripts/fetch_data.py</code> for a script that pulls a fresh copy of this data.
+</footer>
+
+<script>
+const metricLabel = {
+  internet_pct: "Internet users (%)",
+  internet_users: "Internet users",
+  gdp_growth_pct: "GDP/capita growth (%)"
+};
+const colors = { Brazil:"#E8A33D", China:"#F26D6D", Egypt:"#6FA8DC", Ethiopia:"#7FBF7F", Chile:"#C77DFF", Colombia:"#5FD3C4" };
+
+let DATA = null;
+const active = new Set(["Brazil","China","Egypt"]);
+let chart;
+
+async function load(){
+  try {
+    const res = await fetch('data/dataset.json');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    DATA = await res.json();
+    buildChips();
+    render();
+  } catch(e){
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('err').textContent =
+      "Couldn't load data/dataset.json (" + e.message + "). If you're opening this file directly (file://), " +
+      "browsers block local JSON fetches — serve the folder instead, e.g. run `python3 -m http.server` in this " +
+      "directory and open http://localhost:8000, or publish it with GitHub Pages.";
+  }
+}
+
+function buildChips(){
+  const chipsEl = document.getElementById('chips');
+  chipsEl.innerHTML = '';
+  Object.keys(DATA.countries).forEach(name=>{
+    const b = document.createElement('button');
+    b.className = 'chip' + (active.has(name) ? ' active':'');
+    b.textContent = name;
+    b.onclick = ()=>{
+      if(active.has(name)){ active.delete(name); b.classList.remove('active'); }
+      else { active.add(name); b.classList.add('active'); }
+      render();
+    };
+    chipsEl.appendChild(b);
+  });
+}
+
+function render(){
+  if(!DATA) return;
+  const metric = document.getElementById('metric').value;
+  const datasets = Array.from(active).map(name=>({
+    label:name,
+    data:DATA.countries[name][metric],
+    borderColor:colors[name],
+    backgroundColor:colors[name],
+    tension:.3, pointRadius:0, borderWidth:2,
+  }));
+  if(chart) chart.destroy();
+  const ctx = document.getElementById('chart').getContext('2d');
+  chart = new Chart(ctx, {
+    type:'line',
+    data:{ labels:DATA.years, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ labels:{ color:'#E7ECF5' } } },
+      scales:{ x:{ ticks:{ color:'#8592AC' }, grid:{ color:'#22304A' } },
+               y:{ ticks:{ color:'#8592AC' }, grid:{ color:'#22304A' } } }
+    }
+  });
+
+  const statsEl = document.getElementById('stats');
+  statsEl.innerHTML = '';
+  Array.from(active).forEach(name=>{
+    const series = DATA.countries[name][metric];
+    const latest = series[series.length-1];
+    const div = document.createElement('div');
+    div.className = 'stat';
+    const displayVal = metric === 'internet_users' ? Math.round(latest).toLocaleString() : latest.toFixed(1);
+    div.innerHTML = `<span class="num">${displayVal}</span><span class="label">${name} · ${metricLabel[metric]}, 2024</span>`;
+    statsEl.appendChild(div);
+  });
+}
+
+document.getElementById('metric').addEventListener('change', render);
+load();
+</script>
+</body>
+</html>
