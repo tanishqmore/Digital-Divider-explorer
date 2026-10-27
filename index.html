@@ -1,155 +1,719 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1220">
 <title>World Wired — Digital Divide Explorer</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
 <style>
-  :root{
-    --bg:#0B1220; --surface:#121A2B; --line:#22304A;
-    --text:#E7ECF5; --muted:#8592AC; --accent:#E8A33D;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0; background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', system-ui, sans-serif;}
-  h1{font-family:'Instrument Serif', Georgia, serif; font-weight:400;}
-  header{padding:2.5rem 1.5rem 1.5rem; max-width:960px; margin:0 auto;}
-  header h1{font-size:2.4rem; margin:0 0 .4rem;}
-  header p{color:var(--muted); max-width:560px; line-height:1.5; font-size:.95rem;}
-  main{max-width:960px; margin:0 auto; padding:0 1.5rem 3rem;}
-  .panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1.25rem; margin-bottom:1.25rem;}
-  .controls{display:flex; flex-wrap:wrap; gap:1.5rem;}
-  .control-group{display:flex; flex-direction:column; gap:.5rem;}
-  .control-group label{font-size:.78rem; color:var(--muted);}
-  select{background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:.5rem .7rem; font-family:inherit;}
-  .chips{display:flex; flex-wrap:wrap; gap:.4rem; max-width:460px;}
-  .chip{border:1px solid var(--line); border-radius:999px; padding:.35rem .8rem; font-size:.82rem; cursor:pointer; background:transparent; color:var(--muted);}
-  .chip.active{border-color:var(--accent); color:var(--accent);}
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border-radius:10px; overflow:hidden; margin-bottom:1.25rem;}
-  .stat{background:var(--surface); padding:1rem 1.2rem;}
-  .stat .num{font-family:'Instrument Serif',serif; font-size:1.8rem; color:var(--accent); display:block;}
-  .stat .label{font-size:.76rem; color:var(--muted);}
-  .chart-wrap{position:relative; height:380px;}
-  footer{max-width:960px; margin:0 auto; padding:0 1.5rem 2rem; color:var(--muted); font-size:.8rem; line-height:1.6;}
-  footer a{color:var(--accent);}
-  #err{background:#3a1c1c; border:1px solid #7a3b3b; color:#f3c6c6; padding:1rem; border-radius:8px; margin-bottom:1rem; display:none;}
+:root {
+  --bg: #0B1220;
+  --surface: #121A2B;
+  --line: #22304A;
+  --text: #E7ECF5;
+  --muted: #8592AC;
+  --accent: #E8A33D;
+  --green: #7FBF7F;
+  --red: #F26D6D;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+header, main, footer {
+  width: min(1100px, 100%);
+  margin: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+header { padding-top: 38px; padding-bottom: 22px; }
+
+.eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(38px, 6vw, 58px);
+  font-weight: 400;
+  margin: 8px 0;
+}
+
+h2 { font-size: 17px; margin: 0 0 18px; }
+
+p { color: var(--muted); line-height: 1.6; }
+
+header p { max-width: 650px; margin-top: 6px; }
+
+main { padding-bottom: 36px; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.control-group label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+select {
+  min-width: 190px;
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+select:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 7px; max-width: 540px; }
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 12px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+}
+
+.chip.active { border-color: var(--accent); color: var(--accent); }
+.chip:hover { border-color: var(--accent); }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.stat {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.stat .label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.stat .num {
+  display: block;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(25px, 3vw, 36px);
+  color: var(--accent);
+  margin: 10px 0 5px;
+  overflow-wrap: anywhere;
+}
+
+.stat .note { color: var(--muted); font-size: 11px; }
+
+.chart-wrap { position: relative; height: 340px; }
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.section-heading p { font-size: 12px; margin: -8px 0 18px; }
+
+.ranking-list { display: grid; gap: 15px; }
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 30px minmax(95px, 150px) minmax(50px, 1fr) 62px;
+  gap: 12px;
+  align-items: center;
+}
+
+.rank-number { color: var(--muted); font-size: 12px; }
+.rank-name { font-size: 13px; }
+.rank-value { text-align: right; font-size: 13px; font-weight: 600; }
+
+.bar-track {
+  height: 9px;
+  background: var(--bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .25s ease;
+}
+
+.insight {
+  border-left: 3px solid var(--accent);
+  background: var(--bg);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.insight strong { color: var(--accent); }
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+#error {
+  display: none;
+  background: #3a1c1c;
+  border: 1px solid #7a3b3b;
+  color: #f3c6c6;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  padding-bottom: 30px;
+}
+
+footer a { color: var(--accent); }
+
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .panel { padding: 16px; }
+}
+
+@media (max-width: 430px) {
+  header, main, footer { padding-left: 15px; padding-right: 15px; }
+  .stats { gap: 8px; }
+  .stat { padding: 13px; }
+  .controls { gap: 17px; }
+  select { min-width: 0; width: 100%; }
+  .rank-row { grid-template-columns: 20px 85px minmax(30px, 1fr) 48px; gap: 7px; }
+  .rank-name, .rank-value { font-size: 11px; }
+  .chart-wrap { height: 290px; }
+}
 </style>
 </head>
+
 <body>
 <header>
+  <div class="eyebrow">Data • Technology • Inequality</div>
   <h1>World Wired</h1>
-  <p>Real internet-adoption and income data for six countries, 2000–2024, pulled from the World Bank / Our World in Data. Pick a metric, choose countries to compare.</p>
+  <p>
+    Explore internet adoption and income growth across six countries from
+    2000–2024. Compare historical trends, measure the digital divide,
+    and discover where connectivity is growing.
+  </p>
 </header>
+
 <main>
-  <div id="err"></div>
-  <div class="panel controls">
-    <div class="control-group">
-      <label for="metric">Metric</label>
-      <select id="metric">
-        <option value="internet_pct">Internet users (% of population)</option>
-        <option value="internet_users">Internet users (absolute count)</option>
-        <option value="gdp_growth_pct">GDP per capita growth (annual %)</option>
-      </select>
+  <div id="error" role="alert"></div>
+
+  <section class="panel" aria-label="Dashboard filters">
+    <div class="controls">
+      <div class="control-group">
+        <label for="metric">Historical chart metric</label>
+        <select id="metric">
+          <option value="internet_pct">Internet users (% of population)</option>
+          <option value="internet_users">Internet users (absolute count)</option>
+          <option value="gdp_growth_pct">GDP per capita growth (annual %)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="year">Analysis year</label>
+        <select id="year"></select>
+      </div>
+
+      <div class="control-group">
+        <label>Countries to compare</label>
+        <div class="chips" id="chips"></div>
+      </div>
     </div>
-    <div class="control-group">
-      <label>Countries</label>
-      <div class="chips" id="chips"></div>
+  </section>
+
+  <section aria-label="Key performance indicators">
+    <div class="stats" id="stats" aria-live="polite"></div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Historical comparison</h2>
     </div>
-  </div>
-  <div class="stats" id="stats"></div>
-  <div class="panel"><div class="chart-wrap"><canvas id="chart"></canvas></div></div>
+    <p style="font-size:12px;margin-top:-8px">
+      Compare selected countries over time. Hover over the chart to inspect values.
+    </p>
+    <div class="chart-wrap">
+      <canvas id="historyChart" aria-label="Historical country comparison chart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Digital divide ranking</h2>
+      <span id="rankingYear" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+    <p style="font-size:12px;margin-top:-8px">
+      Internet adoption as a percentage of each country's population.
+    </p>
+    <div id="ranking" class="ranking-list" aria-live="polite"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Automated data insights</h2>
+    <div id="insights" class="insight" aria-live="polite">
+      Insights will appear after the dataset loads.
+    </div>
+  </section>
 </main>
+
 <footer>
-  Data: ITU/World Bank World Development Indicators, processed by
-  <a href="https://ourworldindata.org/internet" target="_blank" rel="noopener">Our World in Data</a>
-  (CC BY 4.0). See <code>data/dataset.json</code> for exact source links, and
-  <code>scripts/fetch_data.py</code> for a script that pulls a fresh copy of this data.
+  Data: ITU / World Bank World Development Indicators, processed by
+  <a href="https://ourworldindata.org/internet" target="_blank" rel="noopener noreferrer">Our World in Data</a>.
+  Data license: CC BY 4.0. See <code>data/dataset.json</code> for source details
+  and <code>scripts/fetch_data.py</code> for the data pipeline.
+  <p>Digital divide gap = highest minus lowest selected-country internet adoption rate for the chosen year. This is a descriptive measure, not an official composite index.</p>
 </footer>
 
 <script>
+"use strict";
+
 const metricLabel = {
   internet_pct: "Internet users (%)",
   internet_users: "Internet users",
   gdp_growth_pct: "GDP/capita growth (%)"
 };
-const colors = { Brazil:"#E8A33D", China:"#F26D6D", Egypt:"#6FA8DC", Ethiopia:"#7FBF7F", Chile:"#C77DFF", Colombia:"#5FD3C4" };
+
+const colors = {
+  Brazil: "#E8A33D",
+  China: "#F26D6D",
+  Egypt: "#6FA8DC",
+  Ethiopia: "#7FBF7F",
+  Chile: "#C77DFF",
+  Colombia: "#5FD3C4"
+};
 
 let DATA = null;
-const active = new Set(["Brazil","China","Egypt"]);
-let chart;
+const active = new Set(["Brazil", "China", "Egypt"]);
+let historyChart = null;
 
-async function load(){
+const $ = id => document.getElementById(id);
+
+function formatNumber(value, digits = 1) {
+  if (!Number.isFinite(value)) return "N/A";
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  });
+}
+
+function validValue(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function getValue(country, metric, year) {
+  const index = DATA.years.indexOf(Number(year));
+  if (index < 0) return null;
+
+  const value = DATA.countries[country]?.[metric]?.[index];
+  return validValue(value) ? value : null;
+}
+
+function getSelectedCountries() {
+  return Array.from(active).filter(name => DATA?.countries?.[name]);
+}
+
+function populateYears() {
+  const yearSelect = $("year");
+  yearSelect.innerHTML = "";
+
+  DATA.years.forEach(year => {
+    const option = document.createElement("option");
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  });
+
+  yearSelect.value = DATA.years[DATA.years.length - 1];
+}
+
+function buildChips() {
+  const container = $("chips");
+  container.replaceChildren();
+
+  Object.keys(DATA.countries).forEach(name => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip" + (active.has(name) ? " active" : "");
+    button.textContent = name;
+    button.setAttribute("aria-pressed", String(active.has(name)));
+
+    button.addEventListener("click", () => {
+      if (active.has(name)) {
+        active.delete(name);
+      } else {
+        active.add(name);
+      }
+
+      button.classList.toggle("active", active.has(name));
+      button.setAttribute("aria-pressed", String(active.has(name)));
+      render();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function addStat(label, value, note) {
+  const card = document.createElement("div");
+  card.className = "stat";
+
+  const labelEl = document.createElement("span");
+  labelEl.className = "label";
+  labelEl.textContent = label;
+
+  const valueEl = document.createElement("span");
+  valueEl.className = "num";
+  valueEl.textContent = value;
+
+  const noteEl = document.createElement("span");
+  noteEl.className = "note";
+  noteEl.textContent = note;
+
+  card.append(labelEl, valueEl, noteEl);
+  $("stats").appendChild(card);
+}
+
+function renderStats(year, countries) {
+  const container = $("stats");
+  container.replaceChildren();
+
+  const values = countries
+    .map(name => ({ name, value: getValue(name, "internet_pct", year) }))
+    .filter(item => item.value !== null);
+
+  const average = values.length
+    ? values.reduce((sum, item) => sum + item.value, 0) / values.length
+    : null;
+
+  const sorted = [...values].sort((a, b) => b.value - a.value);
+  const gap = sorted.length >= 2
+    ? sorted[0].value - sorted[sorted.length - 1].value
+    : null;
+
+  addStat(
+    "Countries selected",
+    String(countries.length),
+    "Included in this analysis"
+  );
+
+  addStat(
+    "Average internet adoption",
+    average === null ? "N/A" : formatNumber(average) + "%",
+    "Selected countries • " + year
+  );
+
+  addStat(
+    "Digital divide gap",
+    gap === null ? "N/A" : formatNumber(gap) + " pp",
+    "Highest minus lowest • " + year
+  );
+
+  addStat(
+    "Highest adoption",
+    sorted.length ? formatNumber(sorted[0].value) + "%" : "N/A",
+    sorted.length ? sorted[0].name + " • " + year : "No valid observations"
+  );
+}
+
+function renderHistoryChart(countries, metric) {
+  if (historyChart) {
+    historyChart.destroy();
+    historyChart = null;
+  }
+
+  const datasets = countries.map(name => ({
+    label: name,
+    data: DATA.countries[name][metric].map(value =>
+      validValue(value) ? value : null
+    ),
+    borderColor: colors[name] || "#8592AC",
+    backgroundColor: colors[name] || "#8592AC",
+    tension: 0.25,
+    pointRadius: 2,
+    pointHoverRadius: 5,
+    borderWidth: 2,
+    spanGaps: false
+  }));
+
+  historyChart = new Chart($("historyChart"), {
+    type: "line",
+    data: {
+      labels: DATA.years,
+      datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            color: "#E7ECF5",
+            usePointStyle: true,
+            padding: 18
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: context => {
+              const value = context.parsed.y;
+              if (value === null) return context.dataset.label + ": No data";
+
+              if (metric === "internet_users") {
+                return context.dataset.label + ": " +
+                  Math.round(value).toLocaleString();
+              }
+
+              return context.dataset.label + ": " +
+                formatNumber(value) +
+                (metric === "internet_pct" ? "%" : "%");
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: "#8592AC", maxTicksLimit: 12 },
+          grid: { color: "#22304A" }
+        },
+        y: {
+          ticks: {
+            color: "#8592AC",
+            callback: value => metric === "internet_users"
+              ? Number(value).toLocaleString()
+              : value + "%"
+          },
+          grid: { color: "#22304A" }
+        }
+      }
+    }
+  });
+}
+
+function renderRanking(year, countries) {
+  const container = $("ranking");
+  container.replaceChildren();
+  $("rankingYear").textContent = "Year: " + year;
+
+  const sorted = countries
+    .map(name => ({ name, value: getValue(name, "internet_pct", year) }))
+    .filter(item => item.value !== null)
+    .sort((a, b) => b.value - a.value);
+
+  if (!sorted.length) {
+    const message = document.createElement("div");
+    message.className = "empty";
+    message.textContent = "Select countries with available observations to see rankings.";
+    container.appendChild(message);
+    return;
+  }
+
+  sorted.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "rank-row";
+
+    const rank = document.createElement("span");
+    rank.className = "rank-number";
+    rank.textContent = "#" + (index + 1);
+
+    const name = document.createElement("span");
+    name.className = "rank-name";
+    name.textContent = item.name;
+
+    const track = document.createElement("div");
+    track.className = "bar-track";
+    track.setAttribute("role", "img");
+    track.setAttribute("aria-label",
+      item.name + ": " + formatNumber(item.value) + "% internet adoption");
+
+    const bar = document.createElement("div");
+    bar.className = "bar-fill";
+    bar.style.width = Math.max(0, Math.min(100, item.value)) + "%";
+    bar.style.backgroundColor = colors[item.name] || "#8592AC";
+    track.appendChild(bar);
+
+    const value = document.createElement("span");
+    value.className = "rank-value";
+    value.textContent = formatNumber(item.value) + "%";
+
+    row.append(rank, name, track, value);
+    container.appendChild(row);
+  });
+}
+
+function renderInsights(year, countries) {
+  const container = $("insights");
+
+  const observations = countries
+    .map(name => ({
+      name,
+      current: getValue(name, "internet_pct", year),
+      first: getValue(name, "internet_pct", DATA.years[0])
+    }))
+    .filter(item => item.current !== null);
+
+  if (!observations.length) {
+    container.textContent = "No internet-adoption observations are available for the selected year and countries.";
+    return;
+  }
+
+  const ranked = [...observations].sort((a, b) => b.current - a.current);
+  const leader = ranked[0];
+  const lagging = ranked[ranked.length - 1];
+
+  const changes = observations
+    .filter(item => item.first !== null)
+    .map(item => ({
+      name: item.name,
+      change: item.current - item.first
+    }))
+    .sort((a, b) => b.change - a.change);
+
+  const fastest = changes[0];
+
+  const parts = [];
+
+  parts.push(
+    "In <strong>" + year + "</strong>, <strong>" +
+    leader.name + "</strong> has the highest internet adoption among the selected countries at " +
+    formatNumber(leader.current) + "%."
+  );
+
+  if (ranked.length > 1) {
+    parts.push(
+      "<strong>" + lagging.name + "</strong> has the lowest adoption at " +
+      formatNumber(lagging.current) + "%, leaving a gap of " +
+      formatNumber(leader.current - lagging.current) + " percentage points."
+    );
+  }
+
+  if (fastest) {
+    parts.push(
+      "Compared with " + DATA.years[0] +
+      ", <strong>" + fastest.name + "</strong> has the largest change among countries with data for both years: " +
+      (fastest.change >= 0 ? "+" : "") + formatNumber(fastest.change) +
+      " percentage points."
+    );
+  }
+
+  container.innerHTML = parts.join(" ");
+}
+
+function render() {
+  if (!DATA) return;
+
+  const metric = $("metric").value;
+  const year = Number($("year").value);
+  const countries = getSelectedCountries();
+
+  renderStats(year, countries);
+  renderHistoryChart(countries, metric);
+  renderRanking(year, countries);
+  renderInsights(year, countries);
+}
+
+async function load() {
   try {
-    const res = await fetch('data/dataset.json');
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    DATA = await res.json();
+    if (typeof Chart === "undefined") {
+      throw new Error("Chart.js did not load. Check your internet connection and refresh.");
+    }
+
+    const response = await fetch("data/dataset.json");
+
+    if (!response.ok) {
+      throw new Error("Could not load dataset.json (HTTP " + response.status + ").");
+    }
+
+    DATA = await response.json();
+
+    if (!Array.isArray(DATA.years) || !DATA.countries) {
+      throw new Error("The dataset does not have the expected years/countries structure.");
+    }
+
+    Object.keys(DATA.countries).forEach(name => {
+      if (!DATA.countries[name].internet_pct) {
+        throw new Error("Missing internet_pct data for " + name + ".");
+      }
+    });
+
+    populateYears();
     buildChips();
     render();
-  } catch(e){
-    document.getElementById('err').style.display = 'block';
-    document.getElementById('err').textContent =
-      "Couldn't load data/dataset.json (" + e.message + "). If you're opening this file directly (file://), " +
-      "browsers block local JSON fetches — serve the folder instead, e.g. run `python3 -m http.server` in this " +
-      "directory and open http://localhost:8000, or publish it with GitHub Pages.";
+  } catch (error) {
+    $("error").style.display = "block";
+    $("error").textContent =
+      "Dashboard loading failed: " + error.message +
+      " Open the project using a local server, for example: python -m http.server 8000, then visit http://localhost:8000.";
   }
 }
 
-function buildChips(){
-  const chipsEl = document.getElementById('chips');
-  chipsEl.innerHTML = '';
-  Object.keys(DATA.countries).forEach(name=>{
-    const b = document.createElement('button');
-    b.className = 'chip' + (active.has(name) ? ' active':'');
-    b.textContent = name;
-    b.onclick = ()=>{
-      if(active.has(name)){ active.delete(name); b.classList.remove('active'); }
-      else { active.add(name); b.classList.add('active'); }
-      render();
-    };
-    chipsEl.appendChild(b);
-  });
-}
+$("metric").addEventListener("change", render);
+$("year").addEventListener("change", render);
 
-function render(){
-  if(!DATA) return;
-  const metric = document.getElementById('metric').value;
-  const datasets = Array.from(active).map(name=>({
-    label:name,
-    data:DATA.countries[name][metric],
-    borderColor:colors[name],
-    backgroundColor:colors[name],
-    tension:.3, pointRadius:0, borderWidth:2,
-  }));
-  if(chart) chart.destroy();
-  const ctx = document.getElementById('chart').getContext('2d');
-  chart = new Chart(ctx, {
-    type:'line',
-    data:{ labels:DATA.years, datasets },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{ legend:{ labels:{ color:'#E7ECF5' } } },
-      scales:{ x:{ ticks:{ color:'#8592AC' }, grid:{ color:'#22304A' } },
-               y:{ ticks:{ color:'#8592AC' }, grid:{ color:'#22304A' } } }
-    }
-  });
-
-  const statsEl = document.getElementById('stats');
-  statsEl.innerHTML = '';
-  Array.from(active).forEach(name=>{
-    const series = DATA.countries[name][metric];
-    const latest = series[series.length-1];
-    const div = document.createElement('div');
-    div.className = 'stat';
-    const displayVal = metric === 'internet_users' ? Math.round(latest).toLocaleString() : latest.toFixed(1);
-    div.innerHTML = `<span class="num">${displayVal}</span><span class="label">${name} · ${metricLabel[metric]}, 2024</span>`;
-    statsEl.appendChild(div);
-  });
-}
-
-document.getElementById('metric').addEventListener('change', render);
 load();
 </script>
 </body>

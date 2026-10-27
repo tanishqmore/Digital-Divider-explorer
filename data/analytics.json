@@ -1,0 +1,319 @@
+{
+  "meta": {
+    "title": "World Wired Analytics",
+    "source_dataset": "dataset.json",
+    "forecast_method": "Scikit-learn LinearRegression",
+    "forecast_horizon_years": 5,
+    "correlation_method": "Pearson correlation between annual internet-adoption change and GDP per capita growth",
+    "note": "Forecasts are experimental trend estimates, not guarantees. Correlation does not establish causation."
+  },
+  "aggregate": {
+    "internet_change_vs_gdp_growth": {
+      "value": -0.13921724199645685,
+      "observations": 170
+    }
+  },
+  "countries": {
+    "Brazil": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": -0.32140783393559147,
+        "observations": 24
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2025,
+          2026,
+          2027,
+          2028,
+          2029
+        ],
+        "values": [
+          94.18,
+          97.78,
+          100.0,
+          100.0,
+          100.0
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "mae_percentage_points": 4.607,
+          "rmse_percentage_points": 5.218,
+          "training_observations": 20,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "China": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": -0.05092033686145016,
+        "observations": 25
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2026,
+          2027,
+          2028,
+          2029,
+          2030
+        ],
+        "values": [
+          94.25,
+          98.11,
+          100.0,
+          100.0,
+          100.0
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "mae_percentage_points": 4.901,
+          "rmse_percentage_points": 6.382,
+          "training_observations": 21,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "Egypt": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": -0.02905727863114982,
+        "observations": 24
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2025,
+          2026,
+          2027,
+          2028,
+          2029
+        ],
+        "values": [
+          76.33,
+          79.64,
+          82.96,
+          86.28,
+          89.59
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "mae_percentage_points": 15.484,
+          "rmse_percentage_points": 15.744,
+          "training_observations": 20,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "Ethiopia": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": 0.1309076386864395,
+        "observations": 24
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2025,
+          2026,
+          2027,
+          2028,
+          2029
+        ],
+        "values": [
+          20.96,
+          21.99,
+          23.02,
+          24.05,
+          25.08
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "mae_percentage_points": 1.892,
+          "rmse_percentage_points": 2.11,
+          "training_observations": 20,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "Chile": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": 0.03192032298267349,
+        "observations": 24
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2025,
+          2026,
+          2027,
+          2028,
+          2029
+        ],
+        "values": [
+          100.0,
+          100.0,
+          100.0,
+          100.0,
+          100.0
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "mae_percentage_points": 5.534,
+          "rmse_percentage_points": 6.136,
+          "training_observations": 20,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "Colombia": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": -0.054777835670012966,
+        "observations": 24
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2025,
+          2026,
+          2027,
+          2028,
+          2029
+        ],
+        "values": [
+          87.78,
+          91.34,
+          94.9,
+          98.46,
+          100.0
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2020,
+            2021,
+            2022,
+            2023,
+            2024
+          ],
+          "mae_percentage_points": 6.644,
+          "rmse_percentage_points": 7.024,
+          "training_observations": 20,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    },
+    "India": {
+      "correlation": {
+        "method": "Pearson correlation",
+        "variables": [
+          "Annual change in internet adoption (percentage points)",
+          "GDP per capita growth (annual percent)"
+        ],
+        "value": -0.5086967258963854,
+        "observations": 25
+      },
+      "forecast": {
+        "target": "Internet users (% of population)",
+        "years": [
+          2026,
+          2027,
+          2028,
+          2029,
+          2030
+        ],
+        "values": [
+          55.52,
+          58.14,
+          60.76,
+          63.39,
+          66.01
+        ],
+        "method": "Linear Regression",
+        "evaluation": {
+          "test_years": [
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "mae_percentage_points": 29.43,
+          "rmse_percentage_points": 29.85,
+          "training_observations": 21,
+          "testing_observations": 5
+        },
+        "status": "ok"
+      }
+    }
+  }
+}
